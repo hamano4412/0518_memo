@@ -3,13 +3,13 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { URL } = require('node:url');
 const { samples } = require('./sample-data');
-const { RecordStore } = require('./store');
+const { createStore } = require('./store-factory');
 const { generateSummary, normalizeDate, validateRecordInput } = require('./domain');
 
 function createApp(options = {}) {
   const rootDir = options.rootDir || path.resolve(__dirname, '..');
   const dataFile = options.dataFile || path.join(rootDir, 'data', 'records.json');
-  const store = new RecordStore({ dataFile });
+  const store = options.store || createStore({ dataFile, env: options.env || process.env });
   const ready = store.init();
 
   const server = http.createServer(async (req, res) => {
@@ -34,7 +34,7 @@ function createApp(options = {}) {
             date: sample.date,
             transcript: sample.transcript
           })),
-          records: store.getAll()
+          records: await store.getAll()
         });
       }
 
