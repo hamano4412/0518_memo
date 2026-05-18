@@ -98,6 +98,23 @@ function summarizeSentences(text, keywords, fallback, max = 2) {
   return (picked.slice(0, max).join('。') || fallback).replace(/。+/g, '。').trim();
 }
 
+function extractDecisionAndHomework(text) {
+  const sentences = splitSentences(text);
+  const homeworkKeywords = ['までに', '送付', '準備', '調整', '対応', '確認します', '共有します', '作成します'];
+  const decisionKeywords = ['進めます', '決定', '正式', '役員会議', '稟議', '判断', '前提'];
+
+  const homework = sentences.filter((sentence) => homeworkKeywords.some((keyword) => sentence.includes(keyword)));
+  const decision = sentences.filter((sentence) => {
+    if (homework.includes(sentence)) return false;
+    return decisionKeywords.some((keyword) => sentence.includes(keyword));
+  });
+
+  return {
+    decision: (decision.slice(0, 2).join('。') || '次回アクション中心に継続検討。').replace(/。+/g, '。').trim(),
+    homework: (homework.slice(0, 3).join('。') || '次回までの宿題を要整理。').replace(/。+/g, '。').trim()
+  };
+}
+
 function inferDueDate(text, baseDate) {
   const body = String(text || '');
   const explicit = body.match(/(20\d{2}[\/.-]\d{1,2}[\/.-]\d{1,2}|\d{1,2}[\/.-]\d{1,2}|\d{1,2}日)(?:（[^）]+）)?まで/);
@@ -126,6 +143,7 @@ function generateSummary({ transcript, docUrl, sampleDate }) {
   const ourContact = inferContact(body, true);
   const theirContact = inferContact(body, false);
   const dueDate = inferDueDate(body, date);
+  const extracted = extractDecisionAndHomework(body);
 
   return {
     docUrl: String(docUrl || '').trim(),
@@ -135,8 +153,8 @@ function generateSummary({ transcript, docUrl, sampleDate }) {
     theirContact,
     summary: summarizeSentences(body, ['デモ', '導入', '要件', '比較', '課題', '連携', '活用', '提案', '役員会議', '稟議'], body.slice(0, 140), 3),
     temperature: inferTemperature(body),
-    decision: summarizeSentences(body, ['決定', '進める', '送付', '見積', '再提案', 'プレゼン', '正式', '役員会議', '契約'], '次回アクション中心に継続検討。', 2),
-    homework: summarizeSentences(body, ['までに', '送付', '調整', '準備', '実施', '火曜中', '社内承認', '確認', '作成'], '次回までの宿題を要整理。', 3),
+    decision: extracted.decision,
+    homework: extracted.homework,
     dueDate,
     extractionMode: 'rule-based',
     extractionProvider: 'local-rules'

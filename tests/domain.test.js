@@ -31,3 +31,22 @@ test('generateSummary returns rule-based metadata and split decisions/homework',
   assert.match(summary.summary, /導入デモ/);
   assert.match(summary.homework, /見積書PDF/);
 });
+
+test('generateSummary separates customer decisions from our homework more clearly', () => {
+  const summary = generateSummary({
+    docUrl: 'https://docs.google.com/document/d/example-2/edit',
+    sampleDate: '2026/05/18',
+    transcript: [
+      '商談文字起こし：合同会社テスト様_再提案MTG',
+      '山田：まずは再提案の方向性をすり合わせたいです。',
+      '鈴木：社内では来週の役員会議に上げる前提で進めます。',
+      '鈴木：比較表と費用感があれば判断できます。',
+      '山田：5/21までに比較表と見積書を送付します。'
+    ].join('\n')
+  });
+
+  assert.match(summary.decision, /役員会議/);
+  assert.doesNotMatch(summary.decision, /5\/21までに比較表と見積書を送付/);
+  assert.match(summary.homework, /5\/21までに比較表と見積書を送付/);
+  assert.doesNotMatch(summary.homework, /役員会議/);
+});
