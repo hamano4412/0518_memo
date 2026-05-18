@@ -3,13 +3,19 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { URL } = require('node:url');
 const { samples } = require('./sample-data');
+const { createSummaryService } = require('./summary-service');
 const { createStore } = require('./store-factory');
 const { generateSummary, normalizeDate, validateRecordInput } = require('./domain');
 
 function createApp(options = {}) {
   const rootDir = options.rootDir || path.resolve(__dirname, '..');
   const dataFile = options.dataFile || path.join(rootDir, 'data', 'records.json');
-  const store = options.store || createStore({ dataFile, env: options.env || process.env });
+  const env = options.env || process.env;
+  const store = options.store || createStore({ dataFile, env });
+  const summaryService = options.summaryService || createSummaryService({
+    env,
+    fallbackGenerateSummary: generateSummary
+  });
   const ready = store.init();
 
   const server = http.createServer(async (req, res) => {
@@ -41,7 +47,7 @@ function createApp(options = {}) {
       if (url.pathname === '/api/summary' && req.method === 'POST') {
         const body = await readJson(req);
         const matchedSample = samples.find((sample) => sample.docUrl === body.docUrl);
-        const summary = generateSummary({
+        const summary = await summaryService.summarize({
           docUrl: body.docUrl,
           transcript: body.transcript,
           sampleDate: body.sampleDate || matchedSample?.date || ''

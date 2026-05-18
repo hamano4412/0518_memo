@@ -14,3 +14,11 @@ services:
         sync: false
       - key: SUPABASE_TABLE
         value: meeting_records
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: OPENAI_MODEL
+        value: gpt-4.1-mini
+      - key: OPENAI_TIMEOUT_MS
+        value: 45000
+      - key: OPENAI_REQUIRED
+        value: false

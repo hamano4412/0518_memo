@@ -103,6 +103,57 @@ test('POST /api/summary generates a confirmable record shape', async () => {
   }
 });
 
+test('POST /api/summary uses injected summary service when provided', async () => {
+  const tempDir = await fs.mkdtemp(path.join(os.tmpdir(), 'memo-backend-'));
+  const dataFile = path.join(tempDir, 'records.json');
+  const app = createApp({
+    dataFile,
+    summaryService: {
+      async summarize() {
+        return {
+          docUrl: 'https://docs.google.com/document/d/llm/edit',
+          company: 'LLM株式会社',
+          date: '2026/05/18',
+          ourContact: '阿部',
+          theirContact: '濱野',
+          summary: 'LLM が文字起こしを要約しました。',
+          temperature: '高い / 前向き',
+          decision: '来週までに提案書を送付する。',
+          homework: '見積と提案書を送付。',
+          dueDate: '2026/05/21',
+          extractionMode: 'llm',
+          extractionProvider: 'openai:test'
+        };
+      }
+    }
+  });
+  await app.ready;
+
+  const server = app.listen(0);
+  await new Promise((resolve) => server.once('listening', resolve));
+  const address = server.address();
+  const baseUrl = `http://127.0.0.1:${address.port}`;
+
+  try {
+    const response = await fetch(`${baseUrl}/api/summary`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({
+        docUrl: 'https://docs.google.com/document/d/llm/edit',
+        transcript: 'テスト文字起こし'
+      })
+    });
+
+    assert.equal(response.status, 200);
+    const body = await response.json();
+    assert.equal(body.company, 'LLM株式会社');
+    assert.equal(body.extractionMode, 'llm');
+    assert.equal(body.extractionProvider, 'openai:test');
+  } finally {
+    await new Promise((resolve, reject) => server.close((error) => (error ? reject(error) : resolve())));
+  }
+});
+
 test('POST /api/records saves a new record and persists it', async () => {
   const harness = await startTestServer();
 
