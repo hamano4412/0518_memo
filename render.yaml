@@ -1,8 +1,9 @@
 services:
   - type: web
     name: 0518-memo
-    runtime: static
+    runtime: node
     repo: https://github.com/hamano4412/0518_memo
     branch: main
-    staticPublishPath: .
-    pullRequestPreviewsEnabled: false
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
