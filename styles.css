@@ -210,7 +210,6 @@ tbody td {
   line-height: 1.6;
   background: #fff;
 }
-tbody tr:nth-child(odd) td { background: var(--brand-soft); }
 tr.row-missing td { background: var(--missing) !important; }
 tr.row-today td { background: var(--today) !important; }
 tr.row-overdue td { background: var(--overdue) !important; }
