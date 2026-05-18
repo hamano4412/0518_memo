@@ -3,12 +3,13 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-test('date fields are text inputs so users can type dates manually', () => {
+test('due date fields use calendar inputs and google doc url input is removed', () => {
   const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
   const appJs = fs.readFileSync(path.join(__dirname, '..', 'app.js'), 'utf8');
 
-  assert.match(html, /id="confirmDate" type="text"/);
-  assert.match(html, /id="confirmDueDate" type="text"/);
-  assert.match(html, /placeholder="YYYY\/MM\/DD または YYYY-MM-DD"/);
-  assert.match(appJs, /type="text"[\s\S]*class="due-date-input"/);
+  assert.doesNotMatch(html, /id="docUrl"/);
+  assert.doesNotMatch(html, /Google Doc URL/);
+  assert.match(html, /id="confirmDueDate" type="date"/);
+  assert.match(appJs, /type="date"[\s\S]*class="due-date-input"/);
+  assert.doesNotMatch(appJs, /docUrl/);
 });

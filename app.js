@@ -17,7 +17,6 @@ const els = {
   stepConfirm: document.getElementById('stepConfirm'),
   stepDone: document.getElementById('stepDone'),
   statusBadge: document.getElementById('statusBadge'),
-  docUrl: document.getElementById('docUrl'),
   transcript: document.getElementById('transcript'),
   generateBtn: document.getElementById('generateBtn'),
   backToPasteBtn: document.getElementById('backToPasteBtn'),
@@ -50,7 +49,7 @@ function normalizeDate(value) {
 
 function toDateInput(value) {
   if (!value || value === '—') return '';
-  return normalizeDate(value);
+  return String(value).replaceAll('/', '-');
 }
 
 function todayString() {
@@ -164,8 +163,7 @@ function renderSampleButtons() {
 function loadSample(key) {
   const sample = samples.find((item) => item.key === key);
   if (!sample) return;
-  els.docUrl.value = sample.docUrl;
-  els.docUrl.dataset.sampleDate = sample.date;
+  els.transcript.dataset.sampleDate = sample.date;
   els.transcript.value = sample.transcript;
   resetEntryFlow();
 }
@@ -184,11 +182,9 @@ function renderTable() {
         <td>${escapeHtml(row.homework)}</td>
         <td>
           <input
-            type="text"
-            inputmode="numeric"
+            type="date"
             class="due-date-input"
             data-row-index="${index}"
-            placeholder="YYYY/MM/DD または YYYY-MM-DD"
             value="${toDateInput(row.dueDate || '')}"
           />
         </td>
@@ -271,9 +267,8 @@ els.generateBtn.addEventListener('click', async () => {
     const result = await requestJson('/api/summary', {
       method: 'POST',
       body: JSON.stringify({
-        docUrl: els.docUrl.value.trim(),
         transcript: els.transcript.value,
-        sampleDate: els.docUrl.dataset.sampleDate || ''
+        sampleDate: els.transcript.dataset.sampleDate || ''
       })
     });
     pendingResult = result;
@@ -311,8 +306,7 @@ els.confirmBtn.addEventListener('click', async () => {
 
 els.newEntryBtn.addEventListener('click', () => {
   els.transcript.value = '';
-  els.docUrl.value = '';
-  els.docUrl.dataset.sampleDate = '';
+  els.transcript.dataset.sampleDate = '';
   resetEntryFlow();
 });
 
