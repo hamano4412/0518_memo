@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ja">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>商談文字起こし整理モック</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <section id="loginScreen" class="login-shell">
+      <div class="login-card panel">
+        <p class="eyebrow">Mock Login</p>
+        <h1>商談文字起こし整理モック</h1>
+        <p class="muted">仮ID / 仮Password でログインしてください。</p>
+        <div class="credential-box">
+          <div><strong>ID</strong><span>demo</span></div>
+          <div><strong>Password</strong><span>demo1234</span></div>
+        </div>
+        <label>ログインID</label>
+        <input id="loginId" type="text" placeholder="demo" />
+        <label>Password</label>
+        <input id="loginPassword" type="password" placeholder="demo1234" />
+        <button id="loginBtn" class="primary">ログイン</button>
+        <p id="loginError" class="error-text hidden">ID または Password が違います。</p>
+      </div>
+    </section>
+
+    <div id="appRoot" class="app-shell hidden">
+      <aside class="sidebar">
+        <p class="eyebrow">Local Mock</p>
+        <h1>商談文字起こし整理モック</h1>
+        <p class="muted">議事録入力と商談履歴確認を、実際の運用に近い2画面フローで再現します。</p>
+
+        <nav class="nav-tabs">
+          <button id="navInput" class="nav-tab active">① 文字起こし入力</button>
+          <button id="navHistory" class="nav-tab">② 商談履歴</button>
+        </nav>
+
+        <section class="panel compact">
+          <h2>サンプル読込</h2>
+          <div class="sample-buttons">
+            <button data-sample="saas">SaaS導入MTG</button>
+            <button data-sample="erp">ERP刷新ヒアリング</button>
+          </div>
+        </section>
+
+        <section class="panel compact flow-note">
+          <h2>今回のモック範囲</h2>
+          <ol>
+            <li>文字起こしを貼り付ける</li>
+            <li>確認画面で各列内容を確認・修正する</li>
+            <li>確定で反映完了を表示する</li>
+            <li>商談履歴画面で追加内容と期限を確認する</li>
+          </ol>
+          <p class="tiny muted">※ 今回はモックのため、実際の Google Sheets 書き込みは未接続です。</p>
+        </section>
+      </aside>
+
+      <main class="content">
+        <section id="screenInput" class="screen active">
+          <section id="stepPaste" class="step-panel active">
+            <div class="hero panel">
+              <div>
+                <p class="eyebrow">Step 1</p>
+                <h2>文字起こしを貼り付け</h2>
+                <p class="muted">まずは議事録の文字起こしを貼り付けて送信します。</p>
+              </div>
+              <div class="status" id="statusBadge">入力待ち</div>
+            </div>
+
+            <section class="panel form-panel">
+              <label>Google Doc URL</label>
+              <input id="docUrl" type="text" placeholder="https://docs.google.com/document/d/..." />
+
+              <label>文字起こし本文</label>
+              <textarea id="transcript" rows="18" placeholder="ここに文字起こしを貼り付け"></textarea>
+
+              <div class="actions single">
+                <button id="generateBtn" class="primary">送信して確認画面へ</button>
+              </div>
+            </section>
+          </section>
+
+          <section id="stepConfirm" class="step-panel hidden">
+            <div class="hero panel">
+              <div>
+                <p class="eyebrow">Step 2</p>
+                <h2>各列の内容を確認</h2>
+                <p class="muted">担当者名や決定事項などを確認し、必要なら修正して確定します。</p>
+              </div>
+              <div class="status ready">確認画面</div>
+            </div>
+
+            <section class="panel confirm-panel">
+              <div class="grid-2 confirm-fields">
+                <div>
+                  <label>会社名</label>
+                  <input id="confirmCompany" type="text" />
+                </div>
+                <div>
+                  <label>日付</label>
+                  <input id="confirmDate" type="date" />
+                </div>
+                <div>
+                  <label>弊社担当者名</label>
+                  <input id="confirmOurContact" type="text" />
+                </div>
+                <div>
+                  <label>相手担当者名</label>
+                  <input id="confirmTheirContact" type="text" />
+                </div>
+                <div class="full">
+                  <label>商談概要</label>
+                  <textarea id="confirmSummary" rows="5"></textarea>
+                </div>
+                <div class="full">
+                  <label>今回の決定事項</label>
+                  <textarea id="confirmDecision" rows="4"></textarea>
+                </div>
+                <div class="full">
+                  <label>次回までの宿題</label>
+                  <textarea id="confirmHomework" rows="4"></textarea>
+                </div>
+                <div>
+                  <label>対応期限</label>
+                  <input id="confirmDueDate" type="date" />
+                </div>
+              </div>
+
+              <div class="actions">
+                <button id="backToPasteBtn">文字起こし入力に戻る</button>
+                <button id="confirmBtn" class="primary">確定して反映</button>
+              </div>
+            </section>
+          </section>
+
+          <section id="stepDone" class="step-panel hidden">
+            <div class="panel done-panel">
+              <p class="eyebrow">Step 3</p>
+              <h2>反映しました</h2>
+              <p id="doneMessage">スプレッドシートへ反映しました。</p>
+              <div class="actions">
+                <button id="newEntryBtn">続けて新規登録</button>
+                <button id="goHistoryBtn" class="primary">商談履歴を見る</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section id="screenHistory" class="screen hidden">
+          <section class="hero panel">
+            <div>
+              <p class="eyebrow">History</p>
+              <h2>商談履歴</h2>
+              <p class="muted">HERMES タブに入る想定の履歴一覧です。確定した内容がここへ追加されます。</p>
+            </div>
+            <div class="status" id="rowCount">0件</div>
+          </section>
+
+          <section class="panel history-summary">
+            <div class="mini-stats four">
+              <div class="stat-card"><span>総件数</span><strong id="statTotal">0</strong></div>
+              <div class="stat-card"><span>本日対応期限件数</span><strong id="statTodayDue">0</strong></div>
+              <div class="stat-card"><span>対応期限遅延件数</span><strong id="statOverdue">0</strong></div>
+              <div class="stat-card"><span>期限未入力件数</span><strong id="statNoDue">0</strong></div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>会社名</th>
+                    <th>弊社担当者名</th>
+                    <th>相手担当者名</th>
+                    <th>日付</th>
+                    <th>商談概要</th>
+                    <th>今回の決定事項</th>
+                    <th>次回までの宿題</th>
+                    <th>対応期限</th>
+                  </tr>
+                </thead>
+                <tbody id="sheetRows"></tbody>
+              </table>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+    <script src="./app.js"></script>
+  </body>
+</html>
