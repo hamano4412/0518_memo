@@ -3,6 +3,7 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { URL } = require('node:url');
 const { samples } = require('./sample-data');
+const { createSheetsSync } = require('./sheets-sync');
 const { createSummaryService } = require('./summary-service');
 const { createStore } = require('./store-factory');
 const { generateSummary, normalizeDate, validateRecordInput } = require('./domain');
@@ -16,6 +17,7 @@ function createApp(options = {}) {
     env,
     fallbackGenerateSummary: generateSummary
   });
+  const sheetsSync = options.sheetsSync || createSheetsSync({ env });
   const ready = store.init();
 
   const server = http.createServer(async (req, res) => {
@@ -40,7 +42,10 @@ function createApp(options = {}) {
             date: sample.date,
             transcript: sample.transcript
           })),
-          records: await store.getAll()
+          records: await store.getAll(),
+          integrations: {
+            sheets: sheetsSync.describe()
+          }
         });
       }
 
@@ -58,8 +63,15 @@ function createApp(options = {}) {
       if (url.pathname === '/api/records' && req.method === 'POST') {
         const body = await readJson(req);
         const record = validateRecordInput(body);
-        const created = await store.create(record);
-        return sendJson(res, 201, created);
+        const sheetsResult = await sheetsSync.appendRecord(record);
+        const created = await store.create({
+          ...record,
+          sheetSyncStatus: sheetsResult.synced ? 'synced' : sheetsResult.reason || ''
+        });
+        return sendJson(res, 201, {
+          ...created,
+          sheetSync: sheetsResult
+        });
       }
 
       const dueDateMatch = url.pathname.match(/^\/api\/records\/([^/]+)\/due-date$/);

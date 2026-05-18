@@ -44,7 +44,7 @@
           </div>
         </section>
 
-        <section class="panel compact flow-note">
+          <section class="panel compact flow-note">
           <h2>今回のモック範囲</h2>
           <ol>
             <li>文字起こしを貼り付ける</li>
@@ -52,7 +52,8 @@
             <li>確定で反映完了を表示する</li>
             <li>商談履歴画面で追加内容と期限を確認する</li>
           </ol>
-          <p class="tiny muted">※ 今回はモックのため、実際の Google Sheets 書き込みは未接続です。</p>
+          <p class="tiny muted">※ 抽出はルールベースです。確認画面で必ず内容を見直してください。</p>
+          <p class="tiny muted">※ Google Sheets 書き込みは設定時のみ有効です。</p>
         </section>
       </aside>
 
@@ -74,6 +75,7 @@
 
               <label>文字起こし本文</label>
               <textarea id="transcript" rows="18" placeholder="ここに文字起こしを貼り付け"></textarea>
+              <p id="integrationNote" class="tiny muted helper-text">抽出はルールベースです。内容を確認してから確定してください。</p>
 
               <div class="actions single">
                 <button id="generateBtn" class="primary">送信して確認画面へ</button>
@@ -87,6 +89,7 @@
                 <p class="eyebrow">Step 2</p>
                 <h2>各列の内容を確認</h2>
                 <p class="muted">担当者名や決定事項などを確認し、必要なら修正して確定します。</p>
+                <p id="confirmMeta" class="tiny muted helper-text">抽出方式: ルールベース（要確認）</p>
               </div>
               <div class="status ready">確認画面</div>
             </div>

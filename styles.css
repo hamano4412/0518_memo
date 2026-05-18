@@ -152,6 +152,10 @@ button:hover { filter: brightness(0.98); }
   gap: 12px;
 }
 .confirm-fields .full { grid-column: 1 / -1; }
+.helper-text {
+  margin-top: 8px;
+  line-height: 1.6;
+}
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr;

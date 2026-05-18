@@ -22,3 +22,13 @@ services:
         value: 45000
       - key: OPENAI_REQUIRED
         value: false
+      - key: GOOGLE_SHEETS_ENABLED
+        value: false
+      - key: GOOGLE_SHEETS_SPREADSHEET_ID
+        sync: false
+      - key: GOOGLE_SHEETS_SHEET_NAME
+        value: Sheet1
+      - key: GOOGLE_SERVICE_ACCOUNT_EMAIL
+        sync: false
+      - key: GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
+        sync: false
