@@ -50,7 +50,7 @@ function normalizeDate(value) {
 
 function toDateInput(value) {
   if (!value || value === '—') return '';
-  return String(value).replaceAll('/', '-');
+  return normalizeDate(value);
 }
 
 function todayString() {
@@ -184,9 +184,11 @@ function renderTable() {
         <td>${escapeHtml(row.homework)}</td>
         <td>
           <input
-            type="date"
+            type="text"
+            inputmode="numeric"
             class="due-date-input"
             data-row-index="${index}"
+            placeholder="YYYY/MM/DD または YYYY-MM-DD"
             value="${toDateInput(row.dueDate || '')}"
           />
         </td>
