@@ -33,7 +33,6 @@ const els = {
   confirmHomework: document.getElementById('confirmHomework'),
   confirmDueDate: document.getElementById('confirmDueDate'),
   confirmMeta: document.getElementById('confirmMeta'),
-  integrationNote: document.getElementById('integrationNote'),
   doneMessage: document.getElementById('doneMessage'),
   rowCount: document.getElementById('rowCount'),
   statTotal: document.getElementById('statTotal'),
@@ -126,26 +125,12 @@ function escapeHtml(value) {
     .replaceAll('>', '&gt;');
 }
 
-function formatExtractionMeta(data) {
-  if (!data) return '抽出方式: ルールベース（要確認）';
-  const modeLabel = data.extractionMode === 'llm' ? 'LLM' : 'ルールベース';
-  const provider = data.extractionProvider ? ` / ${data.extractionProvider}` : '';
-  return `抽出方式: ${modeLabel}${provider}（要確認）`;
-}
-
-function formatIntegrationNote(payload) {
-  const sheets = payload?.integrations?.sheets;
-  if (sheets?.enabled) {
-    return `抽出はルールベースです。保存時に Google Sheets (${sheets.sheetName}) にも追記します。`;
-  }
-  return '抽出はルールベースです。内容を確認してから確定してください。';
+function formatExtractionMeta() {
+  return '抽出方式: ルールベース（要確認）';
 }
 
 function buildDoneMessage(created) {
   const company = created.company || '未設定の会社';
-  if (created.sheetSync?.synced) {
-    return `${company} の内容を反映しました。Supabase と Google Sheets の両方で確認できます。`;
-  }
   return `${company} の内容を反映しました。商談履歴画面でも確認できます。`;
 }
 
@@ -251,7 +236,6 @@ async function bootstrap() {
   rows = payload.records;
   renderSampleButtons();
   renderTable();
-  els.integrationNote.textContent = formatIntegrationNote(payload);
   if (samples.length > 0) {
     loadSample(samples[0].key);
   }

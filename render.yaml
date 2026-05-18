@@ -14,21 +14,3 @@ services:
         sync: false
       - key: SUPABASE_TABLE
         value: meeting_records
-      - key: OPENAI_API_KEY
-        sync: false
-      - key: OPENAI_MODEL
-        value: gpt-4.1-mini
-      - key: OPENAI_TIMEOUT_MS
-        value: 45000
-      - key: OPENAI_REQUIRED
-        value: false
-      - key: GOOGLE_SHEETS_ENABLED
-        value: false
-      - key: GOOGLE_SHEETS_SPREADSHEET_ID
-        sync: false
-      - key: GOOGLE_SHEETS_SHEET_NAME
-        value: Sheet1
-      - key: GOOGLE_SERVICE_ACCOUNT_EMAIL
-        sync: false
-      - key: GOOGLE_SERVICE_ACCOUNT_PRIVATE_KEY
-        sync: false

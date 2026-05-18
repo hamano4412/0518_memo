@@ -197,8 +197,7 @@ function validateRecordInput(input) {
     homework: String(input.homework || '').trim(),
     dueDate: normalizeDate(input.dueDate),
     extractionMode: String(input.extractionMode || '').trim(),
-    extractionProvider: String(input.extractionProvider || '').trim(),
-    sheetSyncStatus: String(input.sheetSyncStatus || '').trim()
+    extractionProvider: String(input.extractionProvider || '').trim()
   };
 }
 

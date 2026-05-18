@@ -3,8 +3,6 @@ const fs = require('node:fs/promises');
 const path = require('node:path');
 const { URL } = require('node:url');
 const { samples } = require('./sample-data');
-const { createSheetsSync } = require('./sheets-sync');
-const { createSummaryService } = require('./summary-service');
 const { createStore } = require('./store-factory');
 const { generateSummary, normalizeDate, validateRecordInput } = require('./domain');
 
@@ -13,11 +11,6 @@ function createApp(options = {}) {
   const dataFile = options.dataFile || path.join(rootDir, 'data', 'records.json');
   const env = options.env || process.env;
   const store = options.store || createStore({ dataFile, env });
-  const summaryService = options.summaryService || createSummaryService({
-    env,
-    fallbackGenerateSummary: generateSummary
-  });
-  const sheetsSync = options.sheetsSync || createSheetsSync({ env });
   const ready = store.init();
 
   const server = http.createServer(async (req, res) => {
@@ -42,17 +35,14 @@ function createApp(options = {}) {
             date: sample.date,
             transcript: sample.transcript
           })),
-          records: await store.getAll(),
-          integrations: {
-            sheets: sheetsSync.describe()
-          }
+          records: await store.getAll()
         });
       }
 
       if (url.pathname === '/api/summary' && req.method === 'POST') {
         const body = await readJson(req);
         const matchedSample = samples.find((sample) => sample.docUrl === body.docUrl);
-        const summary = await summaryService.summarize({
+        const summary = generateSummary({
           docUrl: body.docUrl,
           transcript: body.transcript,
           sampleDate: body.sampleDate || matchedSample?.date || ''
@@ -63,15 +53,8 @@ function createApp(options = {}) {
       if (url.pathname === '/api/records' && req.method === 'POST') {
         const body = await readJson(req);
         const record = validateRecordInput(body);
-        const sheetsResult = await sheetsSync.appendRecord(record);
-        const created = await store.create({
-          ...record,
-          sheetSyncStatus: sheetsResult.synced ? 'synced' : sheetsResult.reason || ''
-        });
-        return sendJson(res, 201, {
-          ...created,
-          sheetSync: sheetsResult
-        });
+        const created = await store.create(record);
+        return sendJson(res, 201, created);
       }
 
       const dueDateMatch = url.pathname.match(/^\/api\/records\/([^/]+)\/due-date$/);
