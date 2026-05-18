@@ -68,10 +68,10 @@ test('GET /api/bootstrap returns allowed samples and records only', async () => 
   assert.equal(response.status, 200);
   const body = await response.json();
   assert.equal(Array.isArray(body.samples), true);
-  assert.deepEqual(body.samples.map((sample) => sample.key), ['saas', 'erp']);
+  assert.deepEqual(body.samples.map((sample) => sample.key), ['agentx']);
   assert.equal(body.samples.some((sample) => sample.key === 'nssol'), false);
   assert.equal(Array.isArray(body.records), true);
-  assert.equal(body.records.length >= 2, true);
+  assert.equal(body.records.length >= 1, true);
 
   await harness.close();
 });
@@ -146,7 +146,7 @@ test('PATCH /api/records/:id updates due date and summary counts', async () => {
 
   const bootstrapResponse = await fetch(`${harness.baseUrl}/api/bootstrap`);
   const bootstrap = await bootstrapResponse.json();
-  const target = bootstrap.records.find((record) => record.company === '株式会社A様');
+  const target = bootstrap.records.find((record) => record.company === 'ABC株式会社');
   assert.ok(target);
 
   const patchResponse = await fetch(`${harness.baseUrl}/api/records/${target.id}/due-date`, {
